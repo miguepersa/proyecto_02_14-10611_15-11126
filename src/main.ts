@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import GUI from 'lil-gui'; // Import lil-gui
 import vertexShader from './shaders/vertex.glsl';
 import fragmentShader from './shaders/fragment.glsl';
 
@@ -10,6 +11,7 @@ class App {
   private material: THREE.ShaderMaterial;
   private mesh: THREE.Mesh;
   private startTime: number;
+  private gui: GUI;
 
   private camConfig = {
     fov: 75,
@@ -18,11 +20,16 @@ class App {
     far: 1000,
   };
 
+  private uniforms = {
+    u_time: { value: 0.0 },
+    u_resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+    u_speed: { value: 1.0 }, // Example uniform to control speed
+    u_intensity: { value: 1.0 }, // Example uniform to control intensity
+  };
+
   constructor() {
-    // Create scene
     this.scene = new THREE.Scene();
 
-    // Setup camera
     this.camera = new THREE.PerspectiveCamera(
       this.camConfig.fov,
       this.camConfig.aspect,
@@ -30,76 +37,62 @@ class App {
       this.camConfig.far
     );
 
-    // Setup renderer
     this.renderer = new THREE.WebGLRenderer({
       antialias: true,
       powerPreference: 'high-performance',
     });
+
     if (!this.renderer.capabilities.isWebGL2) {
       console.warn('WebGL 2.0 is not available on this browser.');
     }
+
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(this.renderer.domElement);
 
-    const resolution = new THREE.Vector2(window.innerWidth, window.innerHeight);
-
-    // Create shader material
     this.geometry = new THREE.PlaneGeometry(2, 2);
     this.material = new THREE.RawShaderMaterial({
       vertexShader,
       fragmentShader,
-      uniforms: {
-        projectionMatrix: { value: this.camera.projectionMatrix },
-        viewMatrix: { value: this.camera.matrixWorldInverse },
-        modelMatrix: { value: new THREE.Matrix4() },
-        // custom uniforms
-        u_time: { value: 0.0 },
-        u_resolution: { value: resolution },
-      },
+      uniforms: this.uniforms,
       glslVersion: THREE.GLSL3,
     });
-    // Default way you'll find in TONS of tutorials
-    // this.material = new THREE.ShaderMaterial({
-    //   vertexShader,
-    //   fragmentShader,
-    //   uniforms: {
-    //     time: { value: 0.0 },
-    //     resolution: { value: resolution },
-    //   },
-    // });
 
-    // Create mesh
     this.mesh = new THREE.Mesh(this.geometry, this.material);
     this.scene.add(this.mesh);
     this.camera.position.z = 1.5;
 
-    // Initialize
     this.startTime = Date.now();
     this.onWindowResize();
 
-    // Bind methods
     this.onWindowResize = this.onWindowResize.bind(this);
     this.animate = this.animate.bind(this);
 
-    // Add event listeners
     window.addEventListener('resize', this.onWindowResize);
 
-    // Start the main loop
+    // Setup GUI
+    this.setupGUI();
+
     this.animate();
+  }
+
+  private setupGUI(): void {
+    this.gui = new GUI();
+    this.gui.add(this.uniforms.u_speed, 'value', 0.1, 5.0).name('Speed');
+    this.gui.add(this.uniforms.u_intensity, 'value', 0.1, 5.0).name('Intensity');
   }
 
   private animate(): void {
     requestAnimationFrame(this.animate);
     const elapsedTime = (Date.now() - this.startTime) / 1000;
-    this.material.uniforms.u_time.value = elapsedTime;
+    this.uniforms.u_time.value = elapsedTime * this.uniforms.u_speed.value;
     this.renderer.render(this.scene, this.camera);
   }
 
   private onWindowResize(): void {
-    this.camera.aspect = this.camConfig.aspect;
+    this.camera.aspect = window.innerWidth / window.innerHeight;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(window.innerWidth, window.innerHeight);
-    this.material.uniforms.u_resolution.value.set(window.innerWidth, window.innerHeight);
+    this.uniforms.u_resolution.value.set(window.innerWidth, window.innerHeight);
   }
 }
 
