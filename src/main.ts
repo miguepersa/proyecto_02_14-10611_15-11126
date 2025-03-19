@@ -2,16 +2,18 @@ import * as THREE from 'three';
 import GUI from 'lil-gui'; // Import lil-gui
 import vertexShader from './shaders/vertex.glsl';
 import fragmentShader from './shaders/fragment.glsl';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 class App {
   private scene: THREE.Scene;
   private camera: THREE.PerspectiveCamera;
   private renderer: THREE.WebGLRenderer;
-  private geometry: THREE.PlaneGeometry;
+  private geometry: THREE.BoxGeometry;
   private material: THREE.ShaderMaterial;
   private mesh: THREE.Mesh;
   private startTime: number;
   private gui: GUI;
+  private controls: OrbitControls;
 
   private camConfig = {
     fov: 75,
@@ -29,6 +31,7 @@ class App {
 
   constructor() {
     this.scene = new THREE.Scene();
+    this.scene.background = new THREE.Color(0x00002f);
 
     this.camera = new THREE.PerspectiveCamera(
       this.camConfig.fov,
@@ -49,7 +52,14 @@ class App {
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(this.renderer.domElement);
 
-    this.geometry = new THREE.PlaneGeometry(2, 2);
+        // Set up OrbitControls
+    this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+    this.controls.enableDamping = true; // Smooth camera movement
+    this.controls.dampingFactor = 0.05;
+    this.controls.screenSpacePanning = false;
+    this.controls.maxPolarAngle = Math.PI / 2; // Limit vertical rotation
+
+    this.geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
     this.material = new THREE.RawShaderMaterial({
       vertexShader,
       fragmentShader,
@@ -69,24 +79,22 @@ class App {
 
     window.addEventListener('resize', this.onWindowResize);
 
-    // Setup GUI
-    this.setupGUI();
-
-    this.animate();
-  }
-
-  private setupGUI(): void {
     this.gui = new GUI();
     this.gui.add(this.uniforms.u_speed, 'value', 0.1, 5.0).name('Speed');
     this.gui.add(this.uniforms.u_intensity, 'value', 0.1, 5.0).name('Intensity');
-  }
 
+    this.animate();
+  }
+  
   private animate(): void {
     requestAnimationFrame(this.animate);
     const elapsedTime = (Date.now() - this.startTime) / 1000;
     this.uniforms.u_time.value = elapsedTime * this.uniforms.u_speed.value;
+
+    this.controls.update();
     this.renderer.render(this.scene, this.camera);
   }
+
 
   private onWindowResize(): void {
     this.camera.aspect = window.innerWidth / window.innerHeight;
