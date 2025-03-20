@@ -1,11 +1,13 @@
-// #version 300 es
 precision highp float;
 
-uniform float u_time;
-uniform vec2 u_resolution;
-out vec4 fragColor;
+uniform vec3 u_color;
+varying float vAlpha;
 
 void main() {
-  vec2 uv = gl_FragCoord.xy / u_resolution.xy;
-  fragColor = vec4(uv.x, uv.y, 0.5 + 0.5 * sin(u_time), 1.0);
+    vec2 uv = gl_PointCoord - vec2(0.5);
+    float dist = length(uv);
+    
+    if (dist > 0.5) discard;
+
+    gl_FragColor = vec4(u_color, vAlpha);
 }
