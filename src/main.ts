@@ -87,6 +87,7 @@ class App {
             u_color: { value: new THREE.Color(0.0, 0.5, 0.1)  },
             u_behavior: { value: 2 }, // 0 = Fire, 1 = Spores, 2 = Asteroids
             u_centerOfMass: { value: new THREE.Vector3(0, 0, 0) },
+            u_innerRadius: { value: 0.3 },
 
         },
         transparent: true,
