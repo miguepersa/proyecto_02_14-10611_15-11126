@@ -117,7 +117,7 @@ class App {
     this.gui.add(this.uniforms.u_centerOfMass.value, 'y', -2, 2).name('Center Y');
     this.gui.add(this.uniforms.u_centerOfMass.value, 'z', -2, 2).name('Center Z');
     this.gui.add(this.material.uniforms.u_radius_mult, 'value', 1.0, 20.0).name('Radius Mult');
-    this.gui.add(this.material.uniforms.u_innerRadius, 'value', 0.1, 10.0).name('Inner Radius');
+    this.gui.add(this.material.uniforms.u_innerRadius, 'value', 0.1, 5.0).name('Inner Radius');
     this.gui.add(this.uniforms.u_color.value, 'r', 0.1, 1.0).name('Red');
     this.gui.add(this.uniforms.u_color.value, 'g', 0.1, 1.0).name('Green');
     this.gui.add(this.uniforms.u_color.value, 'b', 0.1, 1.0).name('Blue');

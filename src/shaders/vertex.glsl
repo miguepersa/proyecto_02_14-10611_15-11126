@@ -50,12 +50,9 @@ void main() {
         relativePosition = rotationMatrix * relativePosition;
 
         // Final position
-        newPosition = vec3(u_radius_mult * (relativePosition.x + u_centerOfMass.x), relativePosition.y + u_centerOfMass.y, u_radius_mult * (relativePosition.z + u_centerOfMass.z));
+        newPosition = (relativePosition + u_centerOfMass)*u_radius_mult;
 
-        vAlpha = 1.0; // No alpha fade for rotation (adjust as needed)
-    } else {
-        vAlpha = 1.0; // Default alpha if no behavior is selected
-
+        vAlpha = 1.0;
     }
 
     gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);
