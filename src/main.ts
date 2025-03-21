@@ -26,7 +26,8 @@ class App {
     u_resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
     u_speed: { value: 1.0 }, // Example uniform to control speed
     u_intensity: { value: 1.0 }, // Example uniform to control intensity
-    u_behavior: { value: 0 }
+    u_behavior: { value: 0 },
+    u_centerOfMass: { value: new THREE.Vector3(0, 0, 0) }
   };
 
   constructor() {
@@ -84,7 +85,8 @@ class App {
         uniforms: {
             u_time: { value: 0.0 },
             u_color: { value: new THREE.Color(0.0, 0.5, 0.1)  },
-            u_behavior: { value: 1 }, // 0 = Fire, 1 = Spores
+            u_behavior: { value: 2 }, // 0 = Fire, 1 = Spores, 2 = Asteroids
+            u_centerOfMass: { value: new THREE.Vector3(0, 0, 0) },
 
         },
         transparent: true,
@@ -97,8 +99,6 @@ class App {
     this.fireParticles.position.set(0, 0, 0);
     this.scene.add(this.fireParticles);
     
-
-
     
     this.camera.position.z = 1.5;
 
@@ -113,7 +113,10 @@ class App {
     this.gui = new GUI();
     this.gui.add(this.uniforms.u_speed, 'value', 0.1, 5.0).name('Speed');
     this.gui.add(this.uniforms.u_intensity, 'value', 0.1, 5.0).name('Intensity');
-    this.gui.add(this.material.uniforms.u_behavior, 'value', { Fire: 0, Spores: 1 }).name('Effect Type');
+    this.gui.add(this.uniforms.u_centerOfMass.value, 'x', -2, 2).name('Center X');
+    this.gui.add(this.uniforms.u_centerOfMass.value, 'y', -2, 2).name('Center Y');
+    this.gui.add(this.uniforms.u_centerOfMass.value, 'z', -2, 2).name('Center Z');
+    this.gui.add(this.uniforms.u_behavior, 'value', { Fire: 0, Spores: 1, Asteroids: 2 }).name('Effect Type');
 
     this.animate();
   }
@@ -122,6 +125,18 @@ class App {
     requestAnimationFrame(this.animate);
     const elapsedTime = (Date.now() - this.startTime) / 1000;
     this.material.uniforms.u_time.value = elapsedTime * this.uniforms.u_speed.value * 0.5;
+    
+    this.material.uniforms.u_behavior.value = this.uniforms.u_behavior.value;
+
+    //  Actualizamos el centro de masa cuando estamos en el modo de Asteroides
+    if (this.uniforms.u_behavior.value === 2) {
+      this.material.uniforms.u_centerOfMass.value.set(
+        this.uniforms.u_centerOfMass.value.x, // Centro en X
+        this.uniforms.u_centerOfMass.value.y, // Centro en Y
+        this.uniforms.u_centerOfMass.value.z  // Centro en Z
+      );
+      
+    }
 
     this.controls.update();
     this.renderer.render(this.scene, this.camera);
