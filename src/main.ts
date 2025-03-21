@@ -32,6 +32,7 @@ class App {
     u_centerOfMass: { value: new THREE.Vector3(0, 0, 0) },
     u_radius_mult: { value: 3.0 },
     u_color: { value: new THREE.Color(0.0, 0.5, 0.1)  },
+    u_innerRadius: { value: 0.3 },
   };
 
   constructor() {
@@ -118,7 +119,7 @@ class App {
     this.gui.add(this.uniforms.u_centerOfMass.value, 'y', -2, 2).name('Center Y');
     this.gui.add(this.uniforms.u_centerOfMass.value, 'z', -2, 2).name('Center Z');
     this.gui.add(this.material.uniforms.u_radius_mult, 'value', 1.0, 20.0).name('Radius Mult');
-    this.gui.add(this.uniforms.u_behavior, 'value', { Fire: 0, Spores: 1, Asteroids: 2 }).name('Effect Type');
+    this.gui.add(this.material.uniforms.u_innerRadius, 'value', 0.1, 10.0).name('Inner Radius');
     this.gui.add(this.uniforms.u_color.value, 'r', 0.1, 1.0).name('Red');
     this.gui.add(this.uniforms.u_color.value, 'g', 0.1, 1.0).name('Green');
     this.gui.add(this.uniforms.u_color.value, 'b', 0.1, 1.0).name('Blue');
@@ -130,7 +131,9 @@ class App {
   });
     this.gui.add(this.particleCount, 'value', 100, 50000, 100).name("Particle Count").onChange(() => {
       this.createParticles();
-  });
+    });
+    this.gui.add(this.uniforms.u_behavior, 'value', { Fire: 0, Spores: 1, Asteroids: 2 }).name('Effect Type');
+  
   }
 
   private createParticles() {
