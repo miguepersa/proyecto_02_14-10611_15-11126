@@ -2,6 +2,7 @@ precision highp float;
 
 attribute float lifetime;
 uniform float u_time;
+uniform float u_radius_mult;
 uniform int u_behavior;
 uniform vec3 u_centerOfMass;
 
@@ -37,7 +38,7 @@ void main() {
         relativePosition = rotationMatrix * relativePosition;
 
         // Calcular posicion final
-        newPosition = relativePosition + u_centerOfMass;
+        newPosition = vec3(u_radius_mult * (relativePosition.x + u_centerOfMass.x), relativePosition.y + u_centerOfMass.y, u_radius_mult * (relativePosition.z + u_centerOfMass.z));
 
         vAlpha = 1.0; // No alpha fade for rotation (adjust as needed)
     } else {
