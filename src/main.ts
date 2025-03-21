@@ -11,6 +11,8 @@ class App {
   private geometry: THREE.BufferGeometry;
   private material: THREE.ShaderMaterial;
   private startTime: number;
+  private heightMult: number = 1.0;
+  private radiusMult: number = 1.0;
   private gui: GUI;
   private particles: THREE.Points;
   private controls: OrbitControls;
@@ -120,6 +122,12 @@ class App {
     this.gui.add(this.uniforms.u_color.value, 'r', 0.1, 1.0).name('Red');
     this.gui.add(this.uniforms.u_color.value, 'g', 0.1, 1.0).name('Green');
     this.gui.add(this.uniforms.u_color.value, 'b', 0.1, 1.0).name('Blue');
+    this.gui.add(this, 'heightMult', 0.1, 1.0).name('Height').onChange(() => {
+      this.createParticles();
+  });
+    this.gui.add(this, 'radiusMult', 0.1, 1.0).name('Radius').onChange(() => {
+      this.createParticles();
+  });
     this.gui.add(this.particleCount, 'value', 100, 50000, 100).name("Particle Count").onChange(() => {
       this.createParticles();
   });
@@ -139,8 +147,8 @@ class App {
 
     for (let i = 0; i < this.particleCount.value; i++) {
         const angle = Math.random() * Math.PI * 2;
-        const radius = (Math.random() - Math.random()) * 0.8;
-        const height = (Math.random() - Math.random()) * 0.8;
+        const radius = (Math.random() - Math.random()) * this.radiusMult;
+        const height = (Math.random() - Math.random()) * this.heightMult;
 
         positions[i * 3] = Math.cos(angle) * radius;
         positions[i * 3 + 1] = height;
